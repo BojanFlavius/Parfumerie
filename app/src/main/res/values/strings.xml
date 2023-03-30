@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Parfumerie</string>
+    <string name="da">Da</string>
+    <string name="nu">Nu</string>
+    <string name="skip_question">Skip question</string>
+    <string name="retry_test">Retry test</string>
 </resources>
