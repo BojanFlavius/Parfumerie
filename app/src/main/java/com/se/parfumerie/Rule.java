@@ -1,6 +1,6 @@
 package com.se.parfumerie;
 
-import java.util.Map;
+import java.util.List;
 
 public class Rule {
     private final String condition;
@@ -11,8 +11,8 @@ public class Rule {
         this.conclusion = conclusion;
     }
 
-    public boolean applies(Map<String, Boolean> workingMemory) {
-        return workingMemory.containsKey(condition) && workingMemory.get(condition);
+    public boolean applies(List<String> workingMemory) {
+        return workingMemory.contains(condition) && !workingMemory.contains(conclusion);
     }
 
     public String getConclusion() {

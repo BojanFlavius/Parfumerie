@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,15 +19,18 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final static int MINIMUM_NUMBER_OF_QUESTIONS = 4;
+    private Map<String, String> questionMap;
     private List<String> questions;
     private TextView textView;
-    private Button skipButton;
+    private KnowledgeBasedSystem kbs;
     private int currentQuestionIndex;
 
     @Override
@@ -36,20 +40,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         textView = findViewById(R.id.question);
-        skipButton = findViewById(R.id.skip);
-        questions = new ArrayList<>();
+        Button endButton = findViewById(R.id.endButton);
+        Button yesButton = findViewById(R.id.yesButton);
+        Button noButton = findViewById(R.id.noButton);
+        kbs = new KnowledgeBasedSystem();
+        questionMap = new HashMap<>();
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Intrebari");
+
+        System.out.println(Thread.currentThread() + "in main");
 
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot data : snapshot.getChildren()) {
-                    questions.add(data.getValue(String.class));
+                    questionMap.put(data.getKey(), data.getValue(String.class));
                 }
-                textView.setText(questions.get(0));
+                questions = new ArrayList<>(questionMap.keySet());
                 Collections.shuffle(questions);
+                textView.setText(questions.get(currentQuestionIndex) + "*" + currentQuestionIndex);
             }
 
             @Override
@@ -58,13 +68,31 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        skipButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(currentQuestionIndex + 1 < questions.size()) {
-                    currentQuestionIndex++;
-                }
-                textView.setText(questions.get(currentQuestionIndex));
+        yesButton.setOnClickListener(view -> {
+            if(currentQuestionIndex < questions.size() - 1) { // pus size()
+                kbs.addFact(questionMap.get(questions.get(currentQuestionIndex)));
+                currentQuestionIndex++;
+                textView.setText(questions.get(currentQuestionIndex)+currentQuestionIndex);
+            } else {
+                Toast.makeText(getApplicationContext(), "Nu mai sunt intrebari disponibile", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        noButton.setOnClickListener(view -> {
+            if(currentQuestionIndex < questions.size() - 1) {
+                currentQuestionIndex++;
+                textView.setText(questions.get(currentQuestionIndex)+currentQuestionIndex);
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "Nu mai sunt intrebari disponibile", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        endButton.setOnClickListener(view -> {
+            if(currentQuestionIndex < MINIMUM_NUMBER_OF_QUESTIONS) {
+                Toast.makeText(getApplicationContext(), "Prea putine informatii", Toast.LENGTH_SHORT).show();
+            } else {
+                kbs.infer();// trebuie sa returneze o lista cu parfumuri
             }
         });
 

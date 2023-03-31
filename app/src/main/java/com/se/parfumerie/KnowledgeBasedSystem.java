@@ -1,16 +1,14 @@
 package com.se.parfumerie;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class KnowledgeBasedSystem {
-    private final Map<String, Boolean> workingMemory;
+    public final List<String> workingMemory;
     private final List<Rule> productionRules;
 
     public KnowledgeBasedSystem() {
-        this.workingMemory = new HashMap<>();
+        this.workingMemory = new ArrayList<>();
         this.productionRules = new ArrayList<>();
     }
 
@@ -18,24 +16,22 @@ public class KnowledgeBasedSystem {
         productionRules.add(rule);
     }
 
-    public void addFact(String fact, boolean value) {
-        workingMemory.put(fact, value);
+    public void addFact(String fact) {
+        workingMemory.add(fact);
     }
 
-    public boolean infer(String goal) {
+    public void infer() {
         boolean changed = true;
         while (changed) {
             changed = false;
             for (Rule rule : productionRules) {
-                if (rule.applies(workingMemory) && !workingMemory.containsKey(rule.getConclusion())) {
-                    workingMemory.put(rule.getConclusion(), true);
-                    if (rule.getConclusion().equals(goal)) {
-                        return true;
-                    }
+                if (rule.applies(workingMemory)) {
+                    workingMemory.add(rule.getConclusion());
                     changed = true;
                 }
             }
         }
-        return false;
+        // aici avem workin memory complet si trebuie ales parfumul
+        System.out.println(workingMemory);
     }
 }
