@@ -1,6 +1,7 @@
 package com.se.parfumerie;
 
 import java.util.List;
+import java.util.Set;
 
 public class Rule {
     private final String condition;
@@ -11,11 +12,19 @@ public class Rule {
         this.conclusion = conclusion;
     }
 
-    public boolean applies(List<String> workingMemory) {
+    public boolean applies(Set<String> workingMemory) {
         return workingMemory.contains(condition) && !workingMemory.contains(conclusion);
     }
 
     public String getConclusion() {
         return conclusion;
+    }
+
+    @Override
+    public String toString() {
+        return "Rule{" +
+                "condition='" + condition + '\'' +
+                ", conclusion='" + conclusion + '\'' +
+                "}\n";
     }
 }

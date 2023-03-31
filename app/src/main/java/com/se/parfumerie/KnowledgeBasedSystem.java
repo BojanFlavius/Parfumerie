@@ -1,15 +1,18 @@
 package com.se.parfumerie;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class KnowledgeBasedSystem {
-    public final List<String> workingMemory;
-    private final List<Rule> productionRules;
+    private final Set<String> workingMemory;
+    public final List<Rule> productionRules;
 
     public KnowledgeBasedSystem() {
-        this.workingMemory = new ArrayList<>();
+        this.workingMemory = new HashSet<>();
         this.productionRules = new ArrayList<>();
+
     }
 
     public void addRule(Rule rule) {
