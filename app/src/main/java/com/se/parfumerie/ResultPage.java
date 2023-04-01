@@ -18,7 +18,7 @@ public class ResultPage extends AppCompatActivity {
 
         Intent intent = getIntent();
         List<String> fragrances = intent.getStringArrayListExtra("fragrances");
-        TextView textView = (TextView)findViewById(R.id.text2);
+        TextView textView = findViewById(R.id.text2);
         textView.setText(fragrances.toString());
     }
 }

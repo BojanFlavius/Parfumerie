@@ -4,7 +4,6 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
@@ -19,13 +18,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -63,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 questions = new ArrayList<>(questionMap.keySet());
                 Collections.shuffle(questions);
-                textView.setText(questions.get(currentQuestionIndex) + "*" + currentQuestionIndex);
+                textView.setText(questions.get(currentQuestionIndex));
             }
 
             @Override
@@ -75,12 +72,12 @@ public class MainActivity extends AppCompatActivity {
         database.getReference("Reguli").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot data : snapshot.getChildren()) {
+                for (DataSnapshot data : snapshot.getChildren()) {
                     String key = data.getKey().toLowerCase();
                     String value = data.getValue(String.class).toLowerCase();
-                    if(value.contains(",")) {
+                    if (value.contains(",")) {
                         String[] values = value.split("\\s*,\\s*");
-                        for(String v : values) {
+                        for (String v : values) {
                             kbs.addRule(new Rule(key, v));
                         }
                     } else {
@@ -98,13 +95,10 @@ public class MainActivity extends AppCompatActivity {
         database.getReference("Parfumuri").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                for(DataSnapshot data : snapshot.getChildren()) {
+                for (DataSnapshot data : snapshot.getChildren()) {
                     String values = data.getValue(String.class).toLowerCase();
-//                    System.out.println("////////////" + values);
                     fragrances.put(data.getKey(), Arrays.asList(values.split("\\s*,\\s*")));
                 }
-                System.out.printf(fragrances.toString());
             }
 
             @Override
@@ -114,12 +108,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         yesButton.setOnClickListener(view -> {
-            if(questions != null){
-                if(currentQuestionIndex < questions.size()) { // pus size()
+            if (questions != null) {
+                if (currentQuestionIndex < questions.size()) { // pus size()
                     kbs.addFact(questionMap.get(questions.get(currentQuestionIndex)));
                     currentQuestionIndex++;
-                    if(currentQuestionIndex < questions.size()) {
-                        textView.setText(questions.get(currentQuestionIndex)+currentQuestionIndex);
+                    if (currentQuestionIndex < questions.size()) {
+                        textView.setText(questions.get(currentQuestionIndex));
                     } else {
                         // face ce ar face endButton
                     }
@@ -130,25 +124,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
         noButton.setOnClickListener(view -> {
-            if(currentQuestionIndex < questions.size() - 1) {
+            if (currentQuestionIndex < questions.size() - 1) {
                 currentQuestionIndex++;
-                textView.setText(questions.get(currentQuestionIndex)+currentQuestionIndex);
-            }
-            else {
+                textView.setText(questions.get(currentQuestionIndex));
+            } else {
                 // face ce face end Button
                 Toast.makeText(getApplicationContext(), "Nu mai sunt intrebari disponibile", Toast.LENGTH_SHORT).show();
             }
         });
 
         endButton.setOnClickListener(view -> {
-            if(currentQuestionIndex < 1) {
+            if (currentQuestionIndex < MINIMUM_NUMBER_OF_QUESTIONS) {
                 Toast.makeText(getApplicationContext(), "Prea putine informatii", Toast.LENGTH_SHORT).show();
             } else {
-
-                kbs.infer();// trebuie sa returneze o lista cu parfumuri
                 Intent intent = new Intent(MainActivity.this, ResultPage.class);
-                System.out.println("In main avem urm parfumuri:" + fragrances.keySet().toString());
-                intent.putStringArrayListExtra("fragrances",new ArrayList<>(fragrances.keySet()));
+                intent.putStringArrayListExtra("fragrances", (ArrayList<String>) kbs.infer(fragrances));
                 startActivity(intent);
             }
         });
