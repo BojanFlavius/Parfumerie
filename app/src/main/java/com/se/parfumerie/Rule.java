@@ -1,6 +1,5 @@
 package com.se.parfumerie;
 
-import java.util.List;
 import java.util.Set;
 
 public class Rule {
@@ -18,13 +17,5 @@ public class Rule {
 
     public String getConclusion() {
         return conclusion;
-    }
-
-    @Override
-    public String toString() {
-        return "Rule{" +
-                "condition='" + condition + '\'' +
-                ", conclusion='" + conclusion + '\'' +
-                "}\n";
     }
 }

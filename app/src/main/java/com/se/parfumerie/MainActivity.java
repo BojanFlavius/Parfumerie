@@ -116,37 +116,47 @@ public class MainActivity extends AppCompatActivity {
                     if (currentQuestionIndex < questions.size()) {
                         textView.setText(questions.get(currentQuestionIndex));
                     } else {
-                        // face ce ar face endButton
+                        showResult();
+                        Toast.makeText(getApplicationContext(), "Nu mai sunt intrebari disponibile", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(getApplicationContext(), "Nu mai sunt intrebari disponibile", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
         noButton.setOnClickListener(view -> {
-            if (currentQuestionIndex < questions.size() - 1) {
-                currentQuestionIndex++;
-                textView.setText(questions.get(currentQuestionIndex));
-            } else {
-                // face ce face end Button
-                Toast.makeText(getApplicationContext(), "Nu mai sunt intrebari disponibile", Toast.LENGTH_SHORT).show();
+            if (questions != null) {
+                if (currentQuestionIndex < questions.size() - 1) {
+                    currentQuestionIndex++;
+                    textView.setText(questions.get(currentQuestionIndex));
+                } else {
+                    showResult();
+                    Toast.makeText(getApplicationContext(), "Nu mai sunt intrebari disponibile", Toast.LENGTH_SHORT).show();
+                }
             }
+
         });
 
         endButton.setOnClickListener(view -> {
             if (currentQuestionIndex < MINIMUM_NUMBER_OF_QUESTIONS) {
                 Toast.makeText(getApplicationContext(), "Prea putine informatii", Toast.LENGTH_SHORT).show();
             } else {
-                Intent intent = new Intent(MainActivity.this, ResultPage.class);
-                intent.putStringArrayListExtra("fragrances", (ArrayList<String>) kbs.infer(fragrances));
-                startActivity(intent);
+                showResult();
             }
         });
 
     }
 
-    public void clickExit(View view){
+    private void showResult() {
+        if (kbs.isWorkingMemoryEmpty()) {
+            Toast.makeText(getApplicationContext(), "Prea putine informatii pentru inferenta", Toast.LENGTH_SHORT).show();
+        } else {
+            Intent intent = new Intent(MainActivity.this, ResultPage.class);
+            intent.putStringArrayListExtra("fragrances", (ArrayList<String>) kbs.infer(fragrances));
+            startActivity(intent);
+        }
+    }
+
+    public void clickExit(View view) {
         this.finishAffinity();
     }
 }
